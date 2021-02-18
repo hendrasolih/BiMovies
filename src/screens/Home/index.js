@@ -1,7 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
+  FlatList,
+  Image,
   ImageBackground,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -30,6 +33,7 @@ const Home = () => {
             title: el.title,
             poster: el.poster_path,
             release_date: el.release_date,
+            id: el.id,
           };
         });
         setTrending(data);
@@ -62,22 +66,96 @@ const Home = () => {
     );
   };
 
+  const _renderItemFL = ({item, index}) => {
+    const image = {uri: `${urlImage}${item.poster}`};
+    return (
+      <View
+        style={{
+          height: windowHeight * 0.3,
+          width: windowWidth * 0.5,
+          marginRight: windowWidth * 0.03,
+        }}>
+        <ImageBackground
+          source={image}
+          style={{...styles.image}}
+          imageStyle={{borderRadius: 10}}>
+          <View style={styles.movieTitleCarousel}>
+            <Text style={{fontSize: 14, color: '#fff', textAlign: 'center'}}>
+              {item.title}
+            </Text>
+          </View>
+        </ImageBackground>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.title}>
-        <Text style={{color: '#ff0000', fontSize: 18, fontWeight: 'bold'}}>
-          Bi-Movies
-        </Text>
-      </View>
-      <Carousel
-        layout={'default'}
-        ref={(ref) => (carousel = ref)}
-        data={trending}
-        sliderWidth={windowWidth}
-        itemWidth={windowWidth * 0.6}
-        renderItem={_renderItem}
-        onSnapToItem={(index) => setActiveIndex(index)}
-      />
+      <ScrollView>
+        <View style={styles.title}>
+          <Text style={{color: '#ff0000', fontSize: 18, fontWeight: 'bold'}}>
+            Bi-Movies
+          </Text>
+        </View>
+        <Carousel
+          layout={'default'}
+          ref={(ref) => (carousel = ref)}
+          data={trending}
+          sliderWidth={windowWidth}
+          itemWidth={windowWidth * 0.6}
+          renderItem={_renderItem}
+          onSnapToItem={(index) => setActiveIndex(index)}
+          loop={true}
+        />
+        <View style={{marginLeft: windowWidth * 0.02, marginTop: 7}}>
+          <Text style={{color: 'grey'}}>TRENDING MOVIES</Text>
+          <View
+            style={{
+              borderTopWidth: 3,
+              borderTopColor: 'red',
+              width: windowWidth * 0.2,
+            }}
+          />
+          <FlatList
+            horizontal
+            data={trending}
+            renderItem={_renderItemFL}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </View>
+        <View style={{marginLeft: windowWidth * 0.02, marginTop: 7}}>
+          <Text style={{color: 'grey'}}>TOP RATE MOVIES</Text>
+          <View
+            style={{
+              borderTopWidth: 3,
+              borderTopColor: 'red',
+              width: windowWidth * 0.2,
+            }}
+          />
+          <FlatList
+            horizontal
+            data={trending}
+            renderItem={_renderItemFL}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </View>
+        <View style={{marginLeft: windowWidth * 0.02, marginTop: 7}}>
+          <Text style={{color: 'grey'}}>UPCOMING MOVIES</Text>
+          <View
+            style={{
+              borderTopWidth: 3,
+              borderTopColor: 'red',
+              width: windowWidth * 0.2,
+            }}
+          />
+          <FlatList
+            horizontal
+            data={trending}
+            renderItem={_renderItemFL}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 };
