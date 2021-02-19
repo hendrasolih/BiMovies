@@ -13,6 +13,7 @@ import axios from 'axios';
 import {API_URL, API_KEY, urlImage} from '@env';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import YoutubePlayer from 'react-native-youtube-iframe';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -103,114 +104,151 @@ const DetailMovie = ({route}) => {
   console.log(linkVideo);
 
   return (
-    <View style={{backgroundColor: '#333333', flex: 1}}>
-      <ScrollView>
-        <Image
-          source={image}
-          style={{
-            width: windowWidth,
-            height: windowHeight * 0.4,
-            resizeMode: 'cover',
-          }}
-        />
-        {/* Title, runtime & rating */}
-        <View style={{paddingHorizontal: windowWidth * 0.04}}>
-          <Text style={{...styles.text, fontSize: 30, fontWeight: '600'}}>
-            {detail && detail.title}
-          </Text>
-          <View
+    <>
+      <View style={{backgroundColor: '#333333', flex: 1}}>
+        <ScrollView>
+          <Image
+            source={image}
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: windowHeight * 0.03,
-            }}>
+              width: windowWidth,
+              height: windowHeight * 0.4,
+              resizeMode: 'cover',
+            }}
+          />
+          {/* Title, runtime & rating */}
+          <View style={{paddingHorizontal: windowWidth * 0.04}}>
+            <Text style={{...styles.text, fontSize: 30, fontWeight: '600'}}>
+              {detail && detail.title}
+            </Text>
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginRight: 5,
+                marginBottom: windowHeight * 0.03,
               }}>
-              <MaterialIcons name="schedule" color="#fff" size={14} />
-              <Text style={styles.text}> {detail.runtime} </Text>
-              <Text style={styles.text}>minutes</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginRight: 5,
+                }}>
+                <MaterialIcons name="schedule" color="#fff" size={14} />
+                <Text style={styles.text}> {detail.runtime} </Text>
+                <Text style={styles.text}>minutes</Text>
+              </View>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <MaterialIcons name="star" color="#ffcc00" size={14} />
+                <Text style={styles.text}> {detail.vote_average} </Text>
+                <Text style={styles.text}>(TMDB)</Text>
+              </View>
             </View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <MaterialIcons name="star" color="#ffcc00" size={14} />
-              <Text style={styles.text}> {detail.vote_average} </Text>
-              <Text style={styles.text}>(TMDB)</Text>
+            <View style={{borderBottomWidth: 1, borderColor: '#404040'}} />
+          </View>
+          {/* Title, runtime & rating */}
+          {/* Release date & Genre */}
+          <View
+            style={{
+              flexDirection: 'row',
+              paddingHorizontal: windowWidth * 0.04,
+              marginBottom: windowHeight * 0.03,
+              marginTop: windowHeight * 0.01,
+            }}>
+            <View>
+              <Text style={{...styles.text, fontSize: 20, fontWeight: '600'}}>
+                Release Date
+              </Text>
+              <Text style={{...styles.text, fontSize: 12}}>{date}</Text>
+            </View>
+            <View style={{marginLeft: windowWidth * 0.1}}>
+              <Text style={{...styles.text, fontSize: 20, fontWeight: '600'}}>
+                Genre
+              </Text>
+              <View
+                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                {detail &&
+                  detail.genre &&
+                  detail.genre.map(({id, name}) => {
+                    return (
+                      <View style={styles.genre} key={id}>
+                        <Text style={{...styles.text, fontSize: 12}}>
+                          {name}
+                        </Text>
+                      </View>
+                    );
+                  })}
+              </View>
             </View>
           </View>
-          <View style={{borderBottomWidth: 1, borderColor: '#404040'}} />
-        </View>
-        {/* Title, runtime & rating */}
-        {/* Release date & Genre */}
-        <View
-          style={{
-            flexDirection: 'row',
-            paddingHorizontal: windowWidth * 0.04,
-            marginBottom: windowHeight * 0.03,
-            marginTop: windowHeight * 0.01,
-          }}>
-          <View>
-            <Text style={{...styles.text, fontSize: 20, fontWeight: '600'}}>
-              Release Date
-            </Text>
-            <Text style={{...styles.text, fontSize: 12}}>{date}</Text>
-          </View>
-          <View style={{marginLeft: windowWidth * 0.1}}>
-            <Text style={{...styles.text, fontSize: 20, fontWeight: '600'}}>
-              Genre
-            </Text>
-            <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              {detail &&
-                detail.genre &&
-                detail.genre.map(({id, name}) => {
-                  return (
-                    <View style={styles.genre} key={id}>
-                      <Text style={{...styles.text, fontSize: 12}}>{name}</Text>
-                    </View>
-                  );
-                })}
-            </View>
-          </View>
-        </View>
-        <View
-          style={{
-            borderBottomWidth: 1,
-            borderColor: '#404040',
-            marginHorizontal: windowWidth * 0.04,
-          }}
-        />
-        {/* Release date & Genre */}
-        {/* Synopsis */}
-        <View style={{paddingHorizontal: windowWidth * 0.04}}>
-          <Text style={{...styles.text, fontSize: 20, fontWeight: '600'}}>
-            Synopsis
-          </Text>
-          <Text style={{...styles.text, fontSize: 12}}>{detail.desc}</Text>
           <View
             style={{
               borderBottomWidth: 1,
               borderColor: '#404040',
-              marginTop: windowHeight * 0.03,
+              marginHorizontal: windowWidth * 0.04,
             }}
           />
-        </View>
-        {/* Synopsis */}
-        {/* Trailer */}
-        <View>
-          <YoutubePlayer
-            height={300}
-            play={playing}
-            videoId={linkVideo !== '' && linkVideo}
-            onChangeState={onStateChange}
-          />
-          {/* <Button title={playing ? 'pause' : 'play'} onPress={togglePlaying} /> */}
-        </View>
-        {/* Trailer */}
-      </ScrollView>
-    </View>
+          {/* Release date & Genre */}
+          {/* Synopsis */}
+          <View style={{paddingHorizontal: windowWidth * 0.04}}>
+            <Text style={{...styles.text, fontSize: 20, fontWeight: '600'}}>
+              Synopsis
+            </Text>
+            <Text style={{...styles.text, fontSize: 12}}>{detail.desc}</Text>
+            <View
+              style={{
+                borderBottomWidth: 1,
+                borderColor: '#404040',
+                marginTop: windowHeight * 0.03,
+              }}
+            />
+          </View>
+          {/* Synopsis */}
+          {/* Trailer */}
+          <View>
+            <YoutubePlayer
+              height={300}
+              play={playing}
+              videoId={linkVideo !== '' && linkVideo}
+              onChangeState={onStateChange}
+            />
+            {/* <Button title={playing ? 'pause' : 'play'} onPress={togglePlaying} /> */}
+          </View>
+
+          {/* Trailer */}
+        </ScrollView>
+      </View>
+      <View
+        style={{
+          position: 'absolute',
+          top: 230,
+          right: 0,
+          flexDirection: 'row',
+        }}>
+        <TouchableOpacity
+          style={{
+            backgroundColor: 'red',
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <MaterialIcons name="share" color="#fff" size={24} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: 'red',
+            width: 120,
+            height: 40,
+            borderRadius: 20,
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'row',
+          }}>
+          <MaterialIcons name="sms" color="#fff" size={24} />
+          <Text style={{color: '#fff'}}>1 Review</Text>
+        </TouchableOpacity>
+      </View>
+    </>
   );
 };
 

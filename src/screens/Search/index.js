@@ -20,7 +20,7 @@ const windowHeight = Dimensions.get('window').height;
 const numColumns = 3;
 const numColumnsFalse = 1;
 
-const Search = () => {
+const Search = ({navigation}) => {
   const [keyword, setKeyword] = useState('');
   const [listGenre, setListGenre] = useState([]);
   const [active, setActive] = useState(1);
@@ -163,7 +163,8 @@ const Search = () => {
     // }
     return searcOff ? (
       <TouchableOpacity
-        style={{width: windowWidth * 0.3, height: windowHeight * 0.2}}>
+        style={{width: windowWidth * 0.3, height: windowHeight * 0.2}}
+        onPress={() => navigation.navigate('Detail', {id: item.id})}>
         <ImageBackground
           source={image}
           style={itemMovies}
@@ -191,7 +192,8 @@ const Search = () => {
           marginBottom: 20,
           flexDirection: 'row',
           borderRadius: 10,
-        }}>
+        }}
+        onPress={() => navigation.navigate('Detail', {id: item.id})}>
         <Image
           source={image}
           style={{
