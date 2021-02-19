@@ -135,7 +135,7 @@ const Search = () => {
 
   const moviesGenre = ({item, index}) => {
     let {itemMovies, itemText, itemInvisible} = styles;
-    var months = [
+    const months = [
       'January',
       'February',
       'March',
@@ -149,7 +149,7 @@ const Search = () => {
       'November',
       'December',
     ];
-    var now = new Date(item.release_date);
+    const now = new Date(item.release_date);
     const date =
       months[now.getMonth()] +
       ' ' +

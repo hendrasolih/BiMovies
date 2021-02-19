@@ -17,7 +17,7 @@ import Carousel from 'react-native-snap-carousel';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-const Home = () => {
+const Home = ({navigation}) => {
   const [trending, setTrending] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   useEffect(() => {
@@ -75,7 +75,8 @@ const Home = () => {
           height: windowHeight * 0.3,
           width: windowWidth * 0.5,
           marginRight: windowWidth * 0.03,
-        }}>
+        }}
+        onPress={() => navigation.navigate('Detail', {id: item.id})}>
         <ImageBackground
           source={image}
           style={{...styles.image}}
@@ -166,6 +167,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#333333',
+    flex: 1,
   },
   image: {
     width: '100%',
