@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   FlatList,
+  Image,
   ImageBackground,
   ScrollView,
   StyleSheet,
@@ -12,25 +13,31 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import {API_URL, API_KEY, urlImage} from '@env';
-import {set} from 'react-native-reanimated';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const numColumns = 3;
+const numColumnsFalse = 1;
 
 const Search = () => {
-  const [value, onChangeText] = useState('');
+  const [keyword, setKeyword] = useState('');
   const [listGenre, setListGenre] = useState([]);
   const [active, setActive] = useState(1);
   const [codeGenre, setCodeGenre] = useState(28);
   const [movies, setMovies] = useState([]);
   const [page, setPage] = useState(1);
+  const [searcOff, setSearcOff] = useState(true);
   useEffect(() => {
     // code to run on component mount
     getGenre();
+  }, []);
+  useEffect(() => {
     getMoviesGenre();
-  }, [codeGenre, page]);
+  }, [codeGenre]);
+  useEffect(() => {
+    getMoviesGenreMore();
+  }, [page]);
   // const formatData = (data, numColumns) => {
   //   const totalRows = Math.floor(data.length / numColumns);
   //   let totalLastRow = data.length - totalRows * numColumns;
@@ -51,8 +58,32 @@ const Search = () => {
         console.log(err.message);
       });
   };
-  const getMoviesGenre = () => {
-    axios
+  const getMoviesGenre = async () => {
+    await axios
+      .get(
+        `${API_URL}/discover/movie?api_key=${API_KEY}&with_genres=${codeGenre}&page=1`,
+      )
+      .then((res) => {
+        const data = res.data.results.map((el) => {
+          return {
+            title: el.title,
+            poster: el.poster_path,
+            release_date: el.release_date,
+            id: el.id,
+            desc: el.overview,
+            rating: el.vote_average,
+          };
+        });
+        // console.log('new');
+        setMovies(data);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const getMoviesGenreMore = async () => {
+    await axios
       .get(
         `${API_URL}/discover/movie?api_key=${API_KEY}&with_genres=${codeGenre}&page=${page}`,
       )
@@ -63,9 +94,11 @@ const Search = () => {
             poster: el.poster_path,
             release_date: el.release_date,
             id: el.id,
+            desc: el.overview,
+            rating: el.vote_average,
           };
         });
-        console.log(data.length);
+        // console.log('load more');
         setMovies(movies.concat(data));
       })
       .catch((err) => {
@@ -84,6 +117,7 @@ const Search = () => {
         onPress={() => {
           setActive(index + 1);
           setCodeGenre(item.id);
+          setSearcOff(true);
         }}>
         <Text style={{color: '#fff'}}>{item.name}</Text>
         {active == index + 1 && (
@@ -101,11 +135,33 @@ const Search = () => {
 
   const moviesGenre = ({item, index}) => {
     let {itemMovies, itemText, itemInvisible} = styles;
+    var months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    var now = new Date(item.release_date);
+    const date =
+      months[now.getMonth()] +
+      ' ' +
+      now.getDate() +
+      ',' +
+      ' ' +
+      now.getFullYear();
     const image = {uri: `${urlImage}${item.poster}`};
     // if (item.empty) {
     //   return <View style={[itemMovies, itemInvisible]} />;
     // }
-    return (
+    return searcOff ? (
       <TouchableOpacity
         style={{width: windowWidth * 0.3, height: windowHeight * 0.2}}>
         <ImageBackground
@@ -125,12 +181,73 @@ const Search = () => {
           </View>
         </ImageBackground>
       </TouchableOpacity>
+    ) : (
+      <TouchableOpacity
+        style={{
+          width: windowWidth * 0.9,
+          height: windowHeight * 0.2,
+          marginHorizontal: windowWidth * 0.05,
+          backgroundColor: 'rgba(255,255,255, 0.1)',
+          marginBottom: 20,
+          flexDirection: 'row',
+          borderRadius: 10,
+        }}>
+        <Image
+          source={image}
+          style={{
+            height: '100%',
+            width: '30%',
+            borderTopLeftRadius: 10,
+            borderBottomLeftRadius: 10,
+          }}
+        />
+        <View style={{height: '100%', width: '70%', padding: '5%'}}>
+          <Text style={{color: '#fff', fontSize: 16, fontWeight: '700'}}>
+            {item.title}
+          </Text>
+          <Text style={{color: '#fff', fontSize: 14}}>{date}</Text>
+          <Text style={{color: '#fff', fontSize: 13}}>
+            {item.desc.split(' ').slice(0, 20).join(' ')}...
+          </Text>
+        </View>
+      </TouchableOpacity>
     );
   };
 
   const handleLoadMore = () => {
     setPage(page + 1);
   };
+
+  const search = async () => {
+    await axios
+      .get(
+        `${API_URL}/search/movie?api_key=${API_KEY}&language=en-US&query=${keyword}&page=1&include_adult=false`,
+      )
+      .then((res) => {
+        const data = res.data.results.map((el) => {
+          return {
+            title: el.title,
+            poster: el.poster_path,
+            release_date: el.release_date,
+            id: el.id,
+            desc: el.overview,
+            rating: el.vote_average,
+          };
+        });
+        setMovies(data);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  // const onFocus = () => {
+  //   // do something
+  //   setSearcOff(!searcOff);
+  //   console.log('render');
+  // };
+
+  // console.log(codeGenre, page);
 
   return (
     <View style={styles.container}>
@@ -139,15 +256,24 @@ const Search = () => {
           Find your Favorite Movies
         </Text>
         <Text style={{color: '#fff', fontSize: 24, fontWeight: '700'}}>
-          or Genre...
+          or Genre... {searcOff ? '' : 'active'}
         </Text>
       </View>
 
       <TextInput
+        onSubmitEditing={() => {
+          search();
+          setKeyword('');
+        }}
         style={styles.textInput}
-        onChangeText={(text) => onChangeText(text)}
-        value={value}
+        onChangeText={(text) => setKeyword(text)}
+        value={keyword}
+        pointerEvents="none"
+        onTouchStart={() => {
+          setSearcOff(false);
+        }}
       />
+
       <View>
         <FlatList
           horizontal
@@ -156,16 +282,29 @@ const Search = () => {
           keyExtractor={(item) => item.id.toString()}
         />
       </View>
-
-      <View style={styles.itemContainer}>
-        <FlatList
-          data={movies}
-          renderItem={moviesGenre}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={numColumns}
-          onEndReached={handleLoadMore}
-        />
-      </View>
+      {searcOff ? (
+        <View style={styles.itemContainer}>
+          <FlatList
+            key={'_'}
+            data={movies}
+            renderItem={moviesGenre}
+            keyExtractor={(item, index) => index.toString()}
+            numColumns={numColumns}
+            onEndReached={handleLoadMore}
+          />
+        </View>
+      ) : (
+        <View>
+          <FlatList
+            key={'#'}
+            data={movies}
+            renderItem={moviesGenre}
+            keyExtractor={(item, index) => index.toString()}
+            numColumns={numColumnsFalse}
+            onEndReached={handleLoadMore}
+          />
+        </View>
+      )}
     </View>
   );
 };
