@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import axios from 'axios';
@@ -46,7 +47,7 @@ const Home = () => {
   const _renderItem = ({item, index}) => {
     const image = {uri: `${urlImage}${item.poster}`};
     return (
-      <View
+      <TouchableOpacity
         style={{
           height: windowHeight * 0.37,
           marginLeft: windowWidth * 0.001,
@@ -62,14 +63,14 @@ const Home = () => {
             </Text>
           </View>
         </ImageBackground>
-      </View>
+      </TouchableOpacity>
     );
   };
 
   const _renderItemFL = ({item, index}) => {
     const image = {uri: `${urlImage}${item.poster}`};
     return (
-      <View
+      <TouchableOpacity
         style={{
           height: windowHeight * 0.3,
           width: windowWidth * 0.5,
@@ -85,7 +86,7 @@ const Home = () => {
             </Text>
           </View>
         </ImageBackground>
-      </View>
+      </TouchableOpacity>
     );
   };
 
